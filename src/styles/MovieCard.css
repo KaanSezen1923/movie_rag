@@ -1,0 +1,115 @@
+/* 🎬 Movie Card Container - yatay kaydırmalı liste */
+.movie-card-list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.movie-card-list::-webkit-scrollbar {
+    height: 8px;
+}
+
+.movie-card-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+}
+
+.movie-card-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 📌 Her bir Movie Card */
+.movie-card {
+    flex: 0 0 200px;              /* Kart genişliği sabit */
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    background-color: #101522;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    color: #f8f9ff;
+    min-height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.35);
+}
+
+/* 🎞 Poster Alanı */
+.movie-card__image-wrapper {
+    width: 100%;
+    position: relative;
+    padding-top: 150%;
+    background: linear-gradient(135deg, #1f2a44, #151d30);
+}
+
+.movie-card__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 📝 İçerik Alanı */
+.movie-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 1rem 1rem;
+}
+
+.movie-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.02em;
+}
+
+.movie-card__meta {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #c3c8f0;
+}
+
+.movie-card__meta strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.movie-card__overview {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: #e4e7ff;
+}
+
+.movie-card__reason {
+    margin: 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    background: rgba(71, 111, 255, 0.18);
+    font-size: 0.8rem;
+    line-height: 1.35;
+    color: #dde2ff;
+}
+
+
+@media (max-width: 600px) {
+    .movie-card__content {
+        padding: 1rem;
+    }
+
+    .movie-card__title {
+        font-size: 1rem;
+    }
+}
