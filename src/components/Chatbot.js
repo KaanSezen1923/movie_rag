@@ -1,23 +1,35 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MovieCard from "./MovieCard";
 import "../styles/Chatbot.css";
 
-const Chatbot = () => {
+const API_BASE_URL =  "https://agentic-movie-recommendation-system-api-7.onrender.com";
+
+const Chatbot = ({ sessionId, messages = [], onUpdateMessages }) => {
     const [query, setQuery] = useState("");
-    const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const chatContainerRef = useRef(null);
+
+    const safeMessages = useMemo(() => messages ?? [], [messages]);
 
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [safeMessages]);
+
+    useEffect(() => {
+        setQuery("");
+    }, [sessionId]);
+
+    const appendMessages = (updater) => {
+        if (!sessionId || !onUpdateMessages) return;
+        onUpdateMessages(sessionId, updater);
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         const trimmedQuery = query.trim();
-        if (!trimmedQuery || isLoading) return;
+        if (!trimmedQuery || isLoading || !sessionId) return;
 
         const timestamp = Date.now();
         const userMessage = {
@@ -27,7 +39,7 @@ const Chatbot = () => {
         };
         const pendingBotMessageId = `${timestamp}-bot`;
 
-        setMessages((prevMessages) => [
+        appendMessages((prevMessages) => [
             ...prevMessages,
             userMessage,
             {
@@ -45,7 +57,7 @@ const Chatbot = () => {
 
         try {
             const response = await fetch(
-                `https://agentic-movie-recommendation-system-api-2.onrender.com/process_query/${encodeURIComponent(trimmedQuery)}`
+                `${API_BASE_URL}/process_query/${encodeURIComponent(trimmedQuery)}`
             );
 
             if (!response.ok) {
@@ -57,39 +69,40 @@ const Chatbot = () => {
                 ? data.recommendations
                 : [];
 
-            const recommendationsWithTrailers = await Promise.all(
+            const recommendationsWithAssets = await Promise.all(
                 recommendations.map(async (movie) => {
-                    const firstTitle = movie?.Title ?? movie?.title;
-                    if (!firstTitle) return movie;
+                    const primaryTitle = movie?.Title ?? movie?.title;
+                    if (!primaryTitle) return movie;
 
                     try {
-                        const trailerRes = await fetch(
-                            `https://agentic-movie-recommendation-system-api-2.onrender.com/get_trailer/${encodeURIComponent(firstTitle)}`
-                        );
+                        const [trailerRes, imageRes] = await Promise.all([
+                            fetch(
+                                `${API_BASE_URL}/get_trailer/${encodeURIComponent(primaryTitle)}`
+                            ),
+                            fetch(
+                                `${API_BASE_URL}/get_image/${encodeURIComponent(primaryTitle)}`
+                            ),
+                        ]);
 
-                        const imageRes = await fetch(
-                            `https://agentic-movie-recommendation-system-api-2.onrender.com/get_image/${encodeURIComponent(firstTitle)}`
-                        );
+                        const augmented = { ...movie };
 
                         if (imageRes.ok) {
                             const imageData = await imageRes.json();
-                            movie.image = imageData?.image_url ?? "";
+                            augmented.image = imageData?.image_url ?? augmented.image ?? "";
                         }
 
                         if (trailerRes.ok) {
                             const trailerData = await trailerRes.json();
-                            return { ...movie, trailer: trailerData?.trailer_url ?? "" };
-                        } else {
-                            return movie;
+                            augmented.trailer = trailerData?.trailer_url ?? augmented.trailer ?? "";
                         }
-                    } catch (err) {
-                        console.error(`Trailer fetch failed for ${firstTitle}:`, err);
+
+                        return augmented;
+                    } catch (assetError) {
+                        console.error(`Asset fetch failed for ${primaryTitle}:`, assetError);
                         return movie;
                     }
                 })
             );
-
-
 
             let botText = "";
             if (typeof data === "string") {
@@ -106,23 +119,22 @@ const Chatbot = () => {
                 }
             }
 
-
-            setMessages((prevMessages) =>
+            appendMessages((prevMessages) =>
                 prevMessages.map((message) =>
                     message.id === pendingBotMessageId
                         ? {
                               ...message,
                               text: botText,
-                              recommendations: recommendationsWithTrailers,
+                              recommendations: recommendationsWithAssets,
                               isLoading: false,
                               isError: false,
                           }
                         : message
                 )
             );
-        }catch (error) {
+        } catch (error) {
             console.error("Error fetching response:", error);
-            setMessages((prevMessages) =>
+            appendMessages((prevMessages) =>
                 prevMessages.map((message) =>
                     message.id === pendingBotMessageId
                         ? {
@@ -140,8 +152,6 @@ const Chatbot = () => {
         }
     };
 
-
-
     const normalizeMovie = (movie = {}, fallbackIndex = 0) => ({
         key: (movie && (movie.Title || movie.title || movie.id)) ?? `movie-${fallbackIndex}`,
         title: movie?.Title ?? movie?.title ?? "Untitled",
@@ -158,14 +168,14 @@ const Chatbot = () => {
         <section className="chatbot">
             <div className="chatbot__window">
                 <div className="chatbot__messages" ref={chatContainerRef}>
-                    {messages.length === 0 && (
+                    {safeMessages.length === 0 && (
                         <div className="chatbot__empty-state">
                             <h2>Hos geldin!</h2>
                             <p>Film zevkini paylas, sana ozel oneriler gelsin.</p>
                         </div>
                     )}
 
-                    {messages.map((message) => {
+                    {safeMessages.map((message, index) => {
                         const messageClasses = [
                             "chatbot__message",
                             `chatbot__message--${message.role}`,
@@ -176,7 +186,7 @@ const Chatbot = () => {
                         }
 
                         return (
-                            <div key={message.id} className={messageClasses.join(" ")}>
+                            <div key={message.id ?? `${message.role}-${index}`} className={messageClasses.join(" ")}>
                                 <div className="chatbot__bubble">
                                     {message.isLoading ? (
                                         <span className="chatbot__loader">Bot dusunuyor...</span>
@@ -222,10 +232,10 @@ const Chatbot = () => {
                     placeholder="Bir filmi ya da turu sor..."
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    disabled={isLoading}
+                    disabled={isLoading || !sessionId}
                     className="chatbot__input"
                 />
-                <button type="submit" className="chatbot__submit" disabled={isLoading}>
+                <button type="submit" className="chatbot__submit" disabled={isLoading || !sessionId}>
                     {isLoading ? "Gonderiliyor..." : "Gonder"}
                 </button>
             </form>

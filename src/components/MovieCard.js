@@ -13,6 +13,15 @@ const MovieCard = ({
 }) => {
     return (
         <article className="movie-card">
+            {image && (
+                <div className="movie-card__image-wrapper">
+                    <img
+                        src={image}
+                        alt={title ? `Poster for ${title}` : "Movie poster"}
+                        className="movie-card__image"
+                    />
+                </div>
+            )}
 
             <div className="movie-card__content">
                 {title && <h3 className="movie-card__title">{title}</h3>}
@@ -25,30 +34,17 @@ const MovieCard = ({
                 {genre && (
                     <p className="movie-card__meta"><strong>Genre:</strong> {genre}</p>
                 )}
-                {overview && (
-                    <p className="movie-card__overview">{overview}</p>
+                {overview && <p className="movie-card__overview"><strong>Overview:</strong>{overview}</p>}
+                {reason && <p className="movie-card__reason">{reason}</p>}
+                {trailer && (
+                    <p className="movie-card__trailer">
+                        <strong>Trailer:</strong>{" "}
+                        <a href={trailer} target="_blank" rel="noopener noreferrer">
+                            Watch here
+                        </a>
+                    </p>
                 )}
-                {reason && (
-                    <p className="movie-card__reason">{reason}</p>
-                )}
-                            {image && (
-                <div className="movie-card__image-wrapper">
-                    <img
-                        src={image}
-                        alt={title ? `Poster for ${title}` : "Movie poster"}
-                        className="movie-card__image"
-                    />
-                </div>
-            )}
-            {trailer && (
-                <p className="movie-card__trailer">
-                    <strong>Trailer:</strong>{" "}
-                    <a href={trailer} target="_blank" rel="noopener noreferrer">
-                        Watch here
-                    </a>
-                </p>
-            )}
-
+                          
             </div>
         </article>
     );
