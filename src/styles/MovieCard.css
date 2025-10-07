@@ -1,3 +1,5 @@
+/* === MovieCard.css (Responsive rev) === */
+
 .movie-card-list {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -21,10 +23,7 @@
 .movie-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -37,9 +36,7 @@
                 0 0 0 1px rgba(99, 102, 241, 0.3);
 }
 
-.movie-card:hover::before {
-    opacity: 1;
-}
+.movie-card:hover::before { opacity: 1; }
 
 .movie-card__image-wrapper {
     width: 100%;
@@ -51,17 +48,16 @@
 
 .movie-card__image {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
 }
 
-.movie-card:hover .movie-card__image {
-    transform: scale(1.08);
-}
+.movie-card:hover .movie-card__image { transform: scale(1.08); }
 
 .movie-card__content {
     display: flex;
@@ -91,10 +87,7 @@
     line-height: 1.5;
 }
 
-.movie-card__meta strong {
-    color: #d1d5db;
-    font-weight: 600;
-}
+.movie-card__meta strong { color: #d1d5db; font-weight: 600; }
 
 .movie-card__reason {
     margin: 0.5rem 0 0;
@@ -123,44 +116,36 @@
     gap: 0.25rem;
 }
 
-.movie-card__trailer a:hover {
-    color: #a5b4fc;
-    text-decoration: underline;
+.movie-card__trailer a:hover { color: #a5b4fc; text-decoration: underline; }
+
+/* --- Responsive Izgara --- */
+@media (min-width: 1600px) {
+    .movie-card-list { grid-template-columns: repeat(6, 1fr); gap: 1.75rem; }
 }
 
-/* Responsive Design */
 @media (max-width: 1400px) {
-    .movie-card-list {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.25rem;
-    }
+    .movie-card-list { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
 }
 
 @media (max-width: 1100px) {
-    .movie-card-list {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-    }
+    .movie-card-list { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 }
 
 @media (max-width: 768px) {
-    .movie-card-list {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        padding: 0 0.5rem;
-    }
-    
-    .movie-card__content {
-        padding: 1rem;
-    }
-    
-    .movie-card__title {
-        font-size: 1rem;
-    }
+    .movie-card-list { grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 0 0.5rem; }
+    .movie-card__content { padding: 1rem; }
+    .movie-card__title { font-size: 1rem; }
 }
 
 @media (max-width: 480px) {
-    .movie-card-list {
-        grid-template-columns: 1fr;
-    }
+    .movie-card-list { grid-template-columns: 1fr; }
+    .movie-card { border-radius: 16px; }
+}
+
+/* Klavye odak stilleri (erişilebilirlik) */
+.movie-card:focus-within { outline: 2px solid rgba(129, 140, 248, 0.7); outline-offset: 2px; }
+
+/* Hareket azaltma tercihi */
+@media (prefers-reduced-motion: reduce) {
+    .movie-card, .movie-card__image { transition: none !important; }
 }

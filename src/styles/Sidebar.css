@@ -1,3 +1,5 @@
+/* === Sidebar.css (Responsive rev) === */
+
 .sidebar {
     width: 280px;
     flex: 0 0 280px;
@@ -9,6 +11,8 @@
     border-right: 1px solid rgba(88, 120, 255, 0.15);
     box-shadow: 12px 0 30px rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(8px);
+    height: 100vh;
+    overflow: hidden;
 }
 
 .sidebar__controls {
@@ -47,6 +51,7 @@
     gap: 0.75rem;
     overflow-y: auto;
     padding-right: 0.35rem;
+    min-height: 0; 
 }
 
 .sidebar__empty {
@@ -69,9 +74,7 @@
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.sidebar__session:hover {
-    border-color: rgba(120, 148, 255, 0.45);
-}
+.sidebar__session:hover { border-color: rgba(120, 148, 255, 0.45); }
 
 .sidebar__session--active {
     border-color: rgba(120, 148, 255, 0.7);
@@ -117,21 +120,34 @@
     transition: background 0.2s ease, color 0.2s ease;
 }
 
-.sidebar__delete:hover {
-    background: rgba(244, 98, 98, 0.35);
-    color: #ffe3e3;
-}
+.sidebar__delete:hover { background: rgba(244, 98, 98, 0.35); color: #ffe3e3; }
 
+/* --- Responsive --- */
 @media (max-width: 900px) {
     .sidebar {
         width: 100%;
+        flex: 0 0 auto;
+        height: auto;
+        max-height: none;
         flex-direction: column;
         border-right: none;
         border-bottom: 1px solid rgba(88, 120, 255, 0.15);
         box-shadow: none;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        overflow-y: auto;
     }
+}
 
-    .sidebar__controls {
-        margin-bottom: 1.25rem;
-    }
+
+/* Daha küçük telefonlar için buton dokunma alanlarını büyüt */
+@media (max-width: 480px) {
+    .sidebar { padding: 1rem; }
+    .sidebar__control-button { padding: 0.75rem 0.9rem; border-radius: 14px; }
+}
+
+/* Hareket azaltma tercihi */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar__control-button, .sidebar__session { transition: none; }
 }

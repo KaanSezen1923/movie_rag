@@ -1,3 +1,11 @@
+/* === Chatbot.css (Responsive rev) === */
+
+/* Baz stil: orijinal yapı korunmuştur */
+.app {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+}
 .chatbot {
     display: flex;
     flex-direction: column;
@@ -24,6 +32,7 @@
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(6px);
     overflow: hidden;
+
 }
 
 .chatbot__messages {
@@ -34,6 +43,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.1rem;
+    min-height: 0;
 }
 
 .chatbot__empty-state {
@@ -89,14 +99,9 @@
     border-color: rgba(255, 113, 113, 0.4);
 }
 
-.chatbot__message p {
-    margin: 0;
-}
+.chatbot__message p { margin: 0; }
 
-.chatbot__loader {
-    font-style: italic;
-    opacity: 0.7;
-}
+.chatbot__loader { font-style: italic; opacity: 0.7; }
 
 .chatbot__recommendations .movie-card-list {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -148,38 +153,52 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.chatbot__submit:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
-}
+.chatbot__submit:disabled { cursor: not-allowed; opacity: 0.7; }
 
 .chatbot__submit:not(:disabled):hover {
     transform: translateY(-1px);
     box-shadow: 0 14px 32px rgba(90, 125, 255, 0.35);
 }
 
+/* === Responsive & Erişilebilirlik İyileştirmeleri === */
+
+/* Çok geniş ekranlarda balon genişliğini biraz artır */
+@media (min-width: 1280px) {
+    .chatbot__bubble { max-width: min(68%, 680px); }
+}
+
+/* Tablet ve altı */
 @media (max-width: 768px) {
-    .chatbot {
-        padding: 1rem 1rem 0;
-        border-radius: 20px 20px 0 0;
-    }
+    .chatbot { padding: 1rem 1rem 0; border-radius: 20px 20px 0 0; }
+    .chatbot__window { padding: 1rem; border-radius: 18px; }
+    .chatbot__bubble { max-width: 100%; font-size: 0.95rem; line-height: 1.6; }
+    .chatbot__form { padding: 0.85rem 1rem; border-radius: 16px 16px 0 0; }
+    .chatbot__input, .chatbot__submit { height: 52px; }
+}
 
-    .chatbot__window {
-        padding: 1rem;
-        border-radius: 18px;
-    }
+/* Küçük telefonlar */
+@media (max-width: 480px) {
+    .chatbot { padding: 0.75rem 0.75rem 0; }
+    .chatbot__bubble { padding: 0.85rem 0.95rem; font-size: 0.93rem; }
+    .chatbot__form { gap: 0.6rem; }
+    .chatbot__input { height: 50px; font-size: 0.95rem; }
+    .chatbot__submit { height: 50px; padding: 0 1.1rem; font-size: 0.95rem; }
+}
 
-    .chatbot__bubble {
-        max-width: 100%;
-    }
-
+/* Safe-area: iOS çentik altı/üstü için */
+@supports (padding: max(0px)) {
     .chatbot__form {
-        padding: 0.85rem 1rem;
-        border-radius: 16px 16px 0 0;
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
     }
+}
 
-    .chatbot__input,
-    .chatbot__submit {
-        height: 52px;
-    }
+/* Hareket azaltma tercihi */
+@media (prefers-reduced-motion: reduce) {
+    .chatbot__submit { transition: none; }
+    .chatbot__bubble, .movie-card, .movie-card__image { transition: none !important; }
+}
+
+/* Dokunmatik cihazlarda hover efektlerini yumuşat */
+@media (hover: none) {
+    .chatbot__submit:not(:disabled):hover { transform: none; box-shadow: none; }
 }
