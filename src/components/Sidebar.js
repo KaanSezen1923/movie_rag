@@ -1,19 +1,5 @@
+import { useState } from "react";
 import "../styles/Sidebar.css";
-
-const formatTimestamp = (isoDate) => {
-    if (!isoDate) return "Yeni sohbet";
-    try {
-        const date = new Date(isoDate);
-        return date.toLocaleString("tr-TR", {
-            day: "2-digit",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    } catch (error) {
-        return "Yeni sohbet";
-    }
-};
 
 const Sidebar = ({
     sessions,
@@ -23,6 +9,8 @@ const Sidebar = ({
     onDeleteChat,
     onLogout,
 }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
     const sortedSessions = [...sessions].sort((a, b) => {
         const timeA = new Date(a.updatedAt ?? a.createdAt ?? 0).getTime();
         const timeB = new Date(b.updatedAt ?? b.createdAt ?? 0).getTime();
@@ -30,60 +18,76 @@ const Sidebar = ({
     });
 
     return (
-        <aside className="sidebar">
-            <div className="sidebar__controls">
-                <button type="button" className="sidebar__control-button" onClick={onNewChat}>
-                    Yeni Sohbet
-                </button>
-                <button
-                    type="button"
-                    className="sidebar__control-button sidebar__control-button--secondary"
-                    onClick={onLogout}
-                >
-                    Cikis
-                </button>
-            </div>
+        <>
+            {/* Mobil menü butonu */}
+            <button
+                className="sidebar__toggle-button"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                ☰
+            </button>
 
-            <div className="sidebar__history">
-                {sortedSessions.length === 0 && <p className="sidebar__empty">Henuz sohbet yok</p>}
+            <aside className={`sidebar ${isOpen ? "sidebar--open" : ""}`}>
+                <div className="sidebar__controls">
+                    <button type="button" className="sidebar__control-button" onClick={onNewChat}>
+                        Yeni Sohbet
+                    </button>
+                    <button
+                        type="button"
+                        className="sidebar__control-button sidebar__control-button--secondary"
+                        onClick={onLogout}
+                    >
+                        Çıkış
+                    </button>
+                </div>
 
-                {sortedSessions.map((session) => {
-                    const isActive = session.id === activeSessionId;
-                    return (
-                        <div
-                            key={session.id}
-                            className={`sidebar__session ${isActive ? "sidebar__session--active" : ""}`}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => onSelectChat(session.id)}
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
+                <div className="sidebar__history">
+                    {sortedSessions.length === 0 && <p className="sidebar__empty">Henüz sohbet yok</p>}
+
+                    {sortedSessions.map((session) => {
+                        const isActive = session.id === activeSessionId;
+                        return (
+                            <div
+                                key={session.id}
+                                className={`sidebar__session ${isActive ? "sidebar__session--active" : ""}`}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => {
                                     onSelectChat(session.id);
-                                }
-                            }}
-                        >
-                            <div className="sidebar__session-info">
-                                <h3 className="sidebar__session-title">{session.title || "Adsiz sohbet"}</h3>
-                                <p className="sidebar__session-date">
-                                    {formatTimestamp(session.updatedAt ?? session.createdAt)}
-                                </p>
-                            </div>
-                            <button
-                                type="button"
-                                className="sidebar__delete"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    onDeleteChat(session.id);
+                                    setIsOpen(false); // mobilde otomatik kapat
                                 }}
-                                aria-label="Sohbeti sil"
+                                onKeyDown={(event) => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                        onSelectChat(session.id);
+                                        setIsOpen(false);
+                                    }
+                                }}
                             >
-                                x
-                            </button>
-                        </div>
-                    );
-                })}
-            </div>
-        </aside>
+                                <div className="sidebar__session-info">
+                                    <h3 className="sidebar__session-title">
+                                        {session.title || "Adsız sohbet"}
+                                    </h3>
+                                    <p className="sidebar__session-date">
+                                        {new Date(session.updatedAt ?? session.createdAt).toLocaleString("tr-TR")}
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="sidebar__delete"
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        onDeleteChat(session.id);
+                                    }}
+                                    aria-label="Sohbeti sil"
+                                >
+                                    x
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+            </aside>
+        </>
     );
 };
 
