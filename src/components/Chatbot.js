@@ -170,8 +170,12 @@ const Chatbot = ({ sessionId, messages = [], onUpdateMessages }) => {
                 <div className="chatbot__messages" ref={chatContainerRef}>
                     {safeMessages.length === 0 && (
                         <div className="chatbot__empty-state">
-                            <h2>Hos geldin!</h2>
-                            <p>Film zevkini paylas, sana ozel oneriler gelsin.</p>
+                            <h2>
+                            {localStorage.getItem("username")
+                                ? `Welcome, ${localStorage.getItem("username")} `
+                                : "Welcome."}
+                            </h2>
+                            <p>I'm MovieRag. What do you wanna watch today?</p>
                         </div>
                     )}
 

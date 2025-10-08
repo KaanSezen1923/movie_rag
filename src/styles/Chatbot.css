@@ -17,7 +17,7 @@
     box-sizing: border-box;
     background: radial-gradient(circle at top, #131b30 0%, #090e1b 55%, #060a16 100%);
     color: #f5f7ff;
-    border-radius: 28px;
+    
     box-shadow: inset 0 0 0 1px rgba(88, 120, 255, 0.08);
 }
 
